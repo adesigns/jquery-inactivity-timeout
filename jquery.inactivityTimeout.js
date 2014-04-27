@@ -41,6 +41,7 @@
         var setCookie = function(name, value, path) {
             if (useStore) {
                 store.set(name, value);
+                return;
             }
             
             if (!path) {
