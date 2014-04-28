@@ -1,24 +1,31 @@
 (function($) {
     $.fn.inactivityTimeout = function(options) {
         var defaults = {
-        
+
             //how long to wait (in seconds) before showing inactivity notification
             inactivityWait: 600, //default 10 minutes
-            
+
             //how long to show inactivity dialog (in seconds) before automatically logging out.
             dialogWait: 60, //default 1 minute
-            
+
             //when to reset timer
             bindEvents: "mousemove keydown wheel DOMMouseScroll mousewheel mousedown touchstart touchmove MSPointerDown MSPointerMove",
 
             logoutUrl: '/logout',
-            
+
             dialogMessage : 'For security purposes, you will be automatically logged out in %s seconds ' +
-                            'due to inactivity.&nbsp;&nbsp;<a href="#" style="color: #FFF;"><strong>Click here to stay logged in.</strong></a>',
-            
+                'due to inactivity.&nbsp;&nbsp;<a href="#" style="color: #FFF;"><strong>Click here to stay logged in.</strong></a>',
+
+            // id of the wrapper for the notification dialog
+            dialogId: 'inactivity-notifier',
+
+            // the element in the dialog message to reset the timer.
+            resetSelector: '#inactivity-notifier a',
+
             // the cookie name/localStorage name to use.
             cookieName: 'it_timestamp',
-            
+
+
             //dialog/notification styling            
             dialogBorderColor : '#FF0000',
             dialogBackgroundColor : '#FF6666',
@@ -32,7 +39,7 @@
             dialogActivityCheck,
             countdown,
             useStore,
-            x, 
+            x,
             y;
 
         /**
@@ -43,7 +50,7 @@
                 store.set(name, value);
                 return;
             }
-            
+
             if (!path) {
                 path = "/";
             }
@@ -55,15 +62,15 @@
          * Retrieves a cookie (or store.js if enabled)
          */
         var getCookie = function(name, path) {
-        
+
             if (useStore) {
                 return store.get(name);
             }
-            
+
             if (!path) {
                 path = "/";
             }
-            
+
             var nameEQ = name + "=";
             var ca = document.cookie.split(';');
 
@@ -90,7 +97,7 @@
                 if (evt.clientX == x && evt.clientY == y){
                     return;
                 }
-                
+
                 x = evt.clientX;
                 y = evt.clientY;
             }
@@ -127,7 +134,7 @@
             if (now < dialogCheck) {
                 reset();
             }
-            
+
             // Time has exceeded.  Time to log out.
             if (now >= logoutCheck) {
                 clear();
@@ -137,34 +144,34 @@
 
         var toggleDialog = function() {
             var text = opts.dialogMessage;
-        
+
             var counter = opts.dialogWait;
-                        
+
             $('<div></div>').css({
-                        'border-bottom' : '2px solid ' + opts.dialogBorderColor,
-                        'background-color' : opts.dialogBackgroundColor,
-                        'color' : opts.dialogFontColor,
-                        'padding' : '10px',
-                        'font-size' : opts.dialogFontSize})
-                        .html(text.replace('%s', counter))
-                        .appendTo($('<div id="inactivity-notifier"></div>').css({
-                            'position' : 'fixed',
-                            'width' : '100%',
-                            'text-align' : 'center',
-                            'z-index' : 999999,
-                            'top' : 0,
-                            'left' : 0
-                        }).appendTo('body'));
-            
+                'border-bottom' : '2px solid ' + opts.dialogBorderColor,
+                'background-color' : opts.dialogBackgroundColor,
+                'color' : opts.dialogFontColor,
+                'padding' : '10px',
+                'font-size' : opts.dialogFontSize})
+                .html(text.replace('%s', counter))
+                .appendTo($('<div id="' + opts.dialogId + '"></div>').css({
+                    'position' : 'fixed',
+                    'width' : '100%',
+                    'text-align' : 'center',
+                    'z-index' : 999999,
+                    'top' : 0,
+                    'left' : 0
+                }).appendTo('body'));
+
 
             //display countdown timer
             countdown = window.setInterval(function() {
-                $('#inactivity-notifier').find('div').html(text.replace('%s', Math.max(--counter, 0)));       
+                $('#' + opts.dialogId).find('div').html(text.replace('%s', Math.max(--counter, 0)));
             }, 1000);
-            
-            dialogActivityCheck = window.setInterval(checkDialog, 500);                       
+
+            dialogActivityCheck = window.setInterval(checkDialog, 500);
         }
-        
+
         /**
          * Clear timers and restart the inactivity process.
          */
@@ -172,7 +179,7 @@
             clear();
             init();
         }
-        
+
         /**
          * Clear everything related to the inactivity timer.
          */
@@ -180,22 +187,22 @@
             window.clearInterval(dialogActivityCheck);
             window.clearInterval(activityCheck);
             window.clearInterval(countdown);
-            
-            $('#inactivity-notifier').remove();
-            
+
+            $('#' + opts.dialogId).remove();
+
             unbindEvents();
         }
-        
+
         /**
          * Begin inactivity observer.
          */
         var init = function() {
             setTimestampCookie();
             bindEvents();
-            
+
             activityCheck = window.setInterval(checkInactivity, 1000);
         }
-        
+
         /**
          * Bind the observer events to the document
          */
@@ -204,17 +211,17 @@
                 setTimestampCookie(e);
             });
         }
-        
+
         var unbindEvents = function() {
             $(document).unbind("._inactivityTimeout");
         }
-        
-        
-        $('body').on('click', '#inactivity-notifier  a', function() {
+
+
+        $('body').on('click', opts.resetSelector, function() {
             reset();
             return false;
         });
-        
+
         // determine whether or not to use store.js for localStorage. 
         // Uses document.cookie otherwise.
         if ((typeof store == "undefined") || !store.enabled) {
