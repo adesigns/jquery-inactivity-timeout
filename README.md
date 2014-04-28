@@ -3,6 +3,10 @@ jQuery Inactivity Timeout
 
 This script can be used to warn users that they will be logged out due to inactivity, and subsequenty log them out if they do not choose to continue.  It works across multiple tabs/browser windows by storing a cookie, or by using localStorage with [store.js](https://github.com/marcuswestin/store.js).
 
+Demo
+------------
+A simple demo is available at http://adesigns.github.io/jquery-inactivity-timeout
+
 Dependencies
 ------------
 * jQuery 1.7+
