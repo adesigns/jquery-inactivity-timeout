@@ -18,6 +18,9 @@
 
             // id of the wrapper for the notification dialog
             dialogId: 'inactivity-notifier',
+            
+            // Enable or disable the warning dialog
+            dialogEnabled: true,
 
             // the element in the dialog message to reset the timer.
             resetSelector: '#inactivity-notifier a',
@@ -143,32 +146,36 @@
         }
 
         var toggleDialog = function() {
-            var text = opts.dialogMessage;
-
-            var counter = opts.dialogWait;
-
-            $('<div></div>').css({
-                'border-bottom' : '2px solid ' + opts.dialogBorderColor,
-                'background-color' : opts.dialogBackgroundColor,
-                'color' : opts.dialogFontColor,
-                'padding' : '10px',
-                'font-size' : opts.dialogFontSize})
-                .html(text.replace('%s', counter))
-                .appendTo($('<div id="' + opts.dialogId + '"></div>').css({
-                    'position' : 'fixed',
-                    'width' : '100%',
-                    'text-align' : 'center',
-                    'z-index' : 999999,
-                    'top' : 0,
-                    'left' : 0
-                }).appendTo('body'));
-
-
-            //display countdown timer
-            countdown = window.setInterval(function() {
-                $('#' + opts.dialogId).find('div').html(text.replace('%s', Math.max(--counter, 0)));
-            }, 1000);
-
+            
+            if (opts.dialogEnabled)
+            {
+                var text = opts.dialogMessage;
+    
+                var counter = opts.dialogWait;
+    
+                $('<div></div>').css({
+                    'border-bottom' : '2px solid ' + opts.dialogBorderColor,
+                    'background-color' : opts.dialogBackgroundColor,
+                    'color' : opts.dialogFontColor,
+                    'padding' : '10px',
+                    'font-size' : opts.dialogFontSize})
+                    .html(text.replace('%s', counter))
+                    .appendTo($('<div id="' + opts.dialogId + '"></div>').css({
+                        'position' : 'fixed',
+                        'width' : '100%',
+                        'text-align' : 'center',
+                        'z-index' : 999999,
+                        'top' : 0,
+                        'left' : 0
+                    }).appendTo('body'));
+    
+    
+                //display countdown timer
+                countdown = window.setInterval(function() {
+                    $('#' + opts.dialogId).find('div').html(text.replace('%s', Math.max(--counter, 0)));
+                }, 1000);
+            }
+            
             dialogActivityCheck = window.setInterval(checkDialog, 500);
         }
 
