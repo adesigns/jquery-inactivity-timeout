@@ -152,6 +152,12 @@
                 'background-color' : opts.dialogBackgroundColor,
                 'color' : opts.dialogFontColor,
                 'padding' : '10px',
+                'margin': 0,
+                  'position': 'absolute',
+                  'top': '50%',
+                'width':'100%',
+                  '-ms-transform': 'translateY(-50%)',
+                  'transform': 'translateY(-50%)',
                 'font-size' : opts.dialogFontSize})
                 .html(text.replace('%s', counter))
                 .appendTo($('<div id="' + opts.dialogId + '"></div>').css({
@@ -160,7 +166,8 @@
                     'text-align' : 'center',
                     'z-index' : 999999,
                     'top' : 0,
-                    'left' : 0
+                    'left' : 0,
+                    'height':'100%', 'background-color':'rgba(0,0,0,0.5)'
                 }).appendTo('body'));
 
 
